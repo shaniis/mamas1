@@ -5,56 +5,69 @@
 #ifndef LC3_HW_H_
 #define LC3_HW_H_
 
-typedef enum {NO, YES, MAYBE} ans;
-typedef enum {MEM, ALU} MUX_MemToReg;
-typedef enum {REG2, IM} MUX_ALUSrc;
-typedef enum {ADD, AND} OP_ALUop;
-typedef enum {NF, ZF, PF, ALL, NOBR} BrType;
+//enum bool {NO, YES, MAYBE};
+enum MUX_TOREG {MEM, ALU};
+enum MUX_ALU {REG2, IM, OFFSET};
+enum OP_ALU{ADD, AND};
+enum BR_TYPE {NOBR=0, PF=1, ZF=2, NF=4, ALL=7};
 
 struct Signals
 {
 	struct {
+		bool dataHazardStall;
+		unsigned short DHnewPC;
+		unsigned short DHins;
+	} DataHazard;
+
+	struct {
+		bool Branch;		// 0- no, 1- yes
+		int ctrlHazardStallCycs;
+	} toIF;
+
+	struct {
 		unsigned short newPC;
 		unsigned short ins;
-
 	} IFtoID;
 
 	struct {
 		unsigned short newPC;
-		unsigned short RegData1;
-		unsigned short RegData2;
+		int Reg1Num;
+		int Reg2Num;
+		short RegData1;
+		short RegData2;
+		int RegDst; //number of destination register
 		short IMM;
-		unsigned short RegDst;
-		//unsigned short Rt;
-		//unsigned short Rd;
 
 		//control
-		ans RegWrite; 	// 0- no, 1- yes
-		MUX_MemToReg MemToReg; 	// 0- mem, 1- alu
-		ans Branch;		// 0- no, 1- yes /// <-----------changed!!!
-		BrType whichBr;
-		ans MemWrite;	// 0- no, 1- yes
-		ans MemRead;	// 0- no, 1- yes
-		MUX_ALUSrc ALUSrc;		// 0- reg2, 1- imm
-		OP_ALUop ALUop;		// 0- '+', 1- 'logic and'
-		//int RegDst;	 	// 0- Rt, 1- Rd
-		ans changeFlags;// 0- no, 1- yes.  change flags only for ADD, AND, LD
+		bool RegWrite;
+		MUX_TOREG MemToReg; // 0- mem, 1- alu
+		bool Branch;
+		BR_TYPE whichBr;
+		bool MemWrite;
+		bool MemRead;
+		MUX_ALU ALUSrc;		// 0- reg2, 1- imm
+		OP_ALU ALUop;		// 0- '+', 1- 'logic and'
+		bool changeFlags;// 0- no, 1- yes.  change flags only for ADD, AND, LD
 
 	} IDtoEXE;
 
 	struct {
+		int Reg1Num;
+		int Reg2Num;
 		unsigned short newPC;
-		unsigned short ALU_Res;
-		unsigned short RegData2;
-		unsigned short RegDst;
+		short ALU_Res;
+		short RegData2;
+		int RegDst;  //number of destination register
 
 		//control
 		bool ALU_isZero;
-		ans RegWrite; 	// 0- no, 1- yes
-		MUX_MemToReg MemToReg; 	// 0- mem, 1- alu
-		ans Branch;		// 0- no, 1- yes
-		ans MemWrite;	// 0- no, 1- yes
-		ans MemRead;	// 0- no, 1- yes
+		bool RegWrite;
+		MUX_TOREG MemToReg; // 0- mem, 1- alu
+		bool Branch;
+		BR_TYPE whichBr;
+		bool MemWrite;
+		bool MemRead;
+
 
 	} EXEtoMem;
 };

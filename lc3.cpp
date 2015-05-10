@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
 	LC3 *lc3 = new LC3();
 	Compiler* compiler = new Compiler(argv[1], lc3);
-
+	//sstd::cout << argv[1] << std::endl;
 	int cycles = atoi(argv[2]);
 	if (cycles <= 0) {
 		cout << "number of cycles must be great than zero" << endl;
